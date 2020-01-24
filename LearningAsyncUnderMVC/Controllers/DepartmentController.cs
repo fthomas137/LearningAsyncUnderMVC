@@ -2,7 +2,6 @@
 using LearningAsyncUnderMVC.Services;
 using System;
 using System.Collections.Generic;
-using System.Data.Entity;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -33,7 +32,7 @@ namespace LearningAsyncUnderMVC.Controllers
             if (ModelState.IsValid)
             {
                 var result = await _departmentServices.CreateAsync(model);
-                if (result == 0)
+                if (!result.IsSuccessful)
                     return new HttpStatusCodeResult(HttpStatusCode.InternalServerError);
                 return RedirectToAction("Index");
             }
@@ -62,8 +61,8 @@ namespace LearningAsyncUnderMVC.Controllers
         {
             if (ModelState.IsValid)
             {
-                var result = await _departmentServices.UpdateAsync(department);
-                if (result == 0)
+                var response = await _departmentServices.UpdateAsync(department);
+                if (response.IsSuccessful == false)
                     return new HttpStatusCodeResult(HttpStatusCode.InternalServerError);
                 return RedirectToAction("Index");
             }
@@ -91,8 +90,8 @@ namespace LearningAsyncUnderMVC.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> DeleteConfirmed(int id)
         {
-            var result = await _departmentServices.DeleteAsync(id);
-            if (result == 0)
+            var response = await _departmentServices.DeleteAsync(id);
+            if (!response.IsSuccessful)
                 return new HttpStatusCodeResult(HttpStatusCode.InternalServerError);
             return RedirectToAction("Index");
         }

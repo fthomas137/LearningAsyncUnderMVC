@@ -1,7 +1,7 @@
 ﻿using LearningAsyncUnderMVC.Models;
+using LearningAsyncUnderMVC.Repository;
 using System;
 using System.Collections.Generic;
-using System.Data.Entity;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
@@ -10,43 +10,69 @@ namespace LearningAsyncUnderMVC.Services
 {
     public class DepartmentServices : IDisposable
     {
-        private MyDB _db = new MyDB();
+        private DepartmentRepository _repository = new DepartmentRepository();
 
         public void Dispose()
         {
-            _db.Dispose();
+            _repository.Dispose();
         }
 
         public async Task<Department> GetAsync(int id)
         {
-            return await _db.Departments.FirstOrDefaultAsync(d => d.Id == id);
+            return await _repository.GetAsync(id);
         }
 
         public async Task<List<Department>> GetAllAsync()
         {
-            return await _db.Departments.ToListAsync();
+            return await _repository.GetAllAsync();
         }
 
-        public async Task<int> CreateAsync(Department department)
+        public async Task<Response> CreateAsync(Department department)
         {
-            _db.Departments.Add(department);
-            var result = await _db.SaveChangesAsync();
-            return result;
+            var response = new Response()
+            {
+                IsSuccessful = true
+            };
+            var result = await _repository.CreateAsync(department);
+            if (result != 1)
+            {
+                response.IsSuccessful = false;
+                response.ErrorCode = "500";
+                response.Message = "Record not created";
+            };
+            return response;
         }
 
-        public async Task<int> UpdateAsync(Department department)
+        public async Task<Response> UpdateAsync(Department department)
         {
-            _db.Entry(department).State = EntityState.Modified;
-            return await _db.SaveChangesAsync();
-
+            var response = new Response()
+            {
+                IsSuccessful = true
+            };
+            var result = await _repository.UpdateAsync(department);
+            if (result != 1)
+            {
+                response.IsSuccessful = false;
+                response.ErrorCode = "500";
+                response.Message = "Record not created";
+            };
+            return response;
         }
 
-        public async Task<int> DeleteAsync(int id)
+        public async Task<Response> DeleteAsync(int id)
         {
-            var department = await _db.Departments.FirstOrDefaultAsync(d => d.Id == id);
-            _db.Departments.Remove(department);
-            var result = await _db.SaveChangesAsync();
-            return result;
+            var response = new Response()
+            {
+                IsSuccessful = true
+            };
+            var result = await _repository.DeleteAsync(id);
+            if (result != 1)
+            {
+                response.IsSuccessful = false;
+                response.ErrorCode = "500";
+                response.Message = "Record not created";
+            };
+            return response;
         }
 
     }
