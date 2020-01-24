@@ -1,4 +1,5 @@
 ﻿using LearningAsyncUnderMVC.Models;
+using LearningAsyncUnderMVC.Services;
 using System;
 using System.Collections.Generic;
 using System.Data.Entity;
@@ -12,11 +13,11 @@ namespace LearningAsyncUnderMVC.Controllers
 {
     public class DepartmentController : Controller
     {
-        private MyDB _db = new MyDB();
+        private DepartmentServices _departmentServices = new DepartmentServices();
 
         public async Task<ActionResult> Index()
         {
-            return View(await _db.Departments.ToListAsync());
+            return View(await _departmentServices.GetAllAsync());
         }
 
         public ActionResult Create()
@@ -28,10 +29,12 @@ namespace LearningAsyncUnderMVC.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Create(Department model)
         {
+            
             if (ModelState.IsValid)
             {
-                _db.Departments.Add(model);
-                await _db.SaveChangesAsync();
+                var result = await _departmentServices.CreateAsync(model);
+                if (result == 0)
+                    return new HttpStatusCodeResult(HttpStatusCode.InternalServerError);
                 return RedirectToAction("Index");
             }
             return View(model);
@@ -39,7 +42,7 @@ namespace LearningAsyncUnderMVC.Controllers
 
         public async Task<ActionResult> Details(int id = 0)
         {
-            var department = await _db.Departments.FirstOrDefaultAsync(d => d.Id == id);
+            var department = await _departmentServices.GetAsync(id);
             if (department == null)
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             return View(department);
@@ -47,7 +50,7 @@ namespace LearningAsyncUnderMVC.Controllers
 
         public async Task<ActionResult> Edit(int id = 0)
         {
-            var department = await _db.Departments.FirstOrDefaultAsync(d => d.Id == id);
+            var department = await _departmentServices.GetAsync(id);
             if (department == null)
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             return View(department);
@@ -59,8 +62,9 @@ namespace LearningAsyncUnderMVC.Controllers
         {
             if (ModelState.IsValid)
             {
-                _db.Entry(department).State = EntityState.Modified;
-                await _db.SaveChangesAsync();
+                var result = await _departmentServices.UpdateAsync(department);
+                if (result == 0)
+                    return new HttpStatusCodeResult(HttpStatusCode.InternalServerError);
                 return RedirectToAction("Index");
             }
             return View(department);
@@ -68,7 +72,7 @@ namespace LearningAsyncUnderMVC.Controllers
 
         public async Task<ActionResult> Delete(int id = 0)
         {
-            var department = await _db.Departments.FirstOrDefaultAsync(d => d.Id == id);
+            var department = await _departmentServices.GetAsync(id);
             if (department == null)
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             return View(department);
@@ -87,9 +91,9 @@ namespace LearningAsyncUnderMVC.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> DeleteConfirmed(int id)
         {
-            var department = await _db.Departments.FirstOrDefaultAsync(d => d.Id == id);
-            _db.Departments.Remove(department);
-            await _db.SaveChangesAsync();
+            var result = await _departmentServices.DeleteAsync(id);
+            if (result == 0)
+                return new HttpStatusCodeResult(HttpStatusCode.InternalServerError);
             return RedirectToAction("Index");
         }
 
@@ -98,7 +102,7 @@ namespace LearningAsyncUnderMVC.Controllers
         {
             if (disposing)
             {
-                _db.Dispose();
+                _departmentServices.Dispose();
             }
             base.Dispose(disposing);
         }
