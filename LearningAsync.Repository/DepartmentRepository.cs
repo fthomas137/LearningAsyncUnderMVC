@@ -1,15 +1,21 @@
-﻿using LearningAsyncUnderMVC.Models;
+﻿using LearningAsync.Models.DBTables;
+using LearningAsync.Repository.Models;
 using System;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
-using System.Web;
 
-namespace LearningAsyncUnderMVC.Repository
+namespace LearningAsync.Repository
 {
     public class DepartmentRepository : IDisposable
     {
+        public DepartmentRepository()
+        {
+            Type providerService = typeof(System.Data.Entity.SqlServer.SqlProviderServices);
+        }
+
         private MyDB _db = new MyDB();
 
         public void Dispose()

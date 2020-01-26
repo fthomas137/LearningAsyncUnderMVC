@@ -1,5 +1,5 @@
-﻿using LearningAsyncUnderMVC.Models;
-using LearningAsyncUnderMVC.Services;
+﻿using LearningAsync.Models.DBTables;
+using LearningAsync.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
